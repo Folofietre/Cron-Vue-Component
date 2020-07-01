@@ -1,0 +1,320 @@
+<div class="cron-component">
+   <!-- Cron input field -->
+   <input v-model="fieldData" @click="setCronModal(true)" v-on:change="onFieldDataChanged" placeholder="* * * * * ?" />
+
+   <!-- Cron creator modal -->
+   <modal-view class="cron-modal" v-show="showCronModal" v-on:close="setCronModal(false)">
+      <h3 slot="header">{{$t('message.ui.cron-component.cronTitle')}}</h3>
+      <div slot="body" id="cronTab">
+         <!-- Tab menu -->
+         <div class="ui top attached tabular menu">
+            <a class="item itemTab active" data-tab="tab-seconds">{{ $t("message.ui.cron-component.secondsTitle") }}</a>
+            <a class="item itemTab" data-tab="tab-minutes">{{ $t("message.ui.cron-component.minutesTitle") }}</a>
+            <a class="item itemTab" data-tab="tab-hours">{{ $t("message.ui.cron-component.hoursTitle") }}</a>
+            <a class="item itemTab" data-tab="tab-days">{{ $t("message.ui.cron-component.daysTitle") }}</a>
+            <a class="item itemTab" data-tab="tab-months">{{ $t("message.ui.cron-component.monthsTitle") }}</a>
+            <a class="item itemTab" data-tab="tab-years">{{ $t("message.ui.cron-component.yearsTitle") }}</a>
+         </div>
+         <!-- Seconds -->
+         <div class="ui bottom attached tab segment active cron-tab" data-tab="tab-seconds">
+            <table class="ui definition table">
+               <tbody>
+                  <!-- Every seconds (*) -->
+                  <tr>
+                     <td>
+                        <label for="everySecond">{{ $t("message.ui.cron-component.secondsEvery") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="seconds" v-model="second.cronEvery" id="everySecond"
+                           value="everySecond" @change="cron">
+                     </td>
+                     <td></td>
+                  </tr>
+                  <!--  (int) -->
+                  <tr>
+                     <td>
+                        <label for="specificSecond">{{ $t("message.ui.cron-component.secondsSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="seconds" v-model="second.cronEvery" id="specificSecond"
+                           value="specificSecond" @change="cron">
+                     </td>
+                     <td>
+                        <!-- Fomantic dropdown -->
+                        <div class="ui fluid search selection dropdown" :id="secondDropdownId" v-show="second.cronEvery==='specificSecond'">
+                           <input type="hidden" name="secondInput" v-model="second.specific" value="second.specific" ref="valueDropdownSecond" @change="update('second')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 60" :data-value="val-1">{{val-1}}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- Minutes -->
+         <div class="ui bottom attached tab segment cron-tab" data-tab="tab-minutes">
+            <table class="ui definition table">
+               <tbody>
+                  <!-- Every Minutes (*) -->
+                  <tr>
+                     <td>
+                        <label for="everyMinute">{{ $t("message.ui.cron-component.minutesEvery") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="minutes" v-model="minute.cronEvery" id="everyMinute"
+                           value="everyMinute" @change="cron">
+                     </td>
+                     <td></td>
+                  </tr>
+                  <!-- Pick a Minute (int) -->
+                  <tr>
+                     <td>
+                        <label for="specificMinute">{{ $t("message.ui.cron-component.minutesSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="minutes" v-model="minute.cronEvery" id="specificMinute"
+                           value="specificMinute" @change="cron">
+                     </td>
+                     <td>
+                        <div class="ui fluid search selection dropdown" :id="minuteDropdownId" v-show="minute.cronEvery==='specificMinute'">
+                           <input type="hidden" name="minuteInput" v-model="minute.specific" value="minute.specific" ref="valueDropdownMinute" @change="update('minute')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 60" :data-value="val-1">{{val-1}}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- Hours -->
+         <div class="ui bottom attached tab segment cron-tab" data-tab="tab-hours">
+            <table class="ui definition table">
+               <tbody>
+                  <!-- Every Hour -->
+                  <tr>
+                     <td>
+                        <label for="everyHour">{{ $t("message.ui.cron-component.hoursEvery") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="hours" v-model="hour.cronEvery" id="everyHour" value="everyHour"
+                           @change="cron">
+                     </td>
+                     <td></td>
+                  </tr>
+                  <!-- Pick an Hour (int) -->
+                  <tr>
+                     <td>
+                        <label for="specificHour">{{ $t("message.ui.cron-component.hoursSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="hours" v-model="hour.cronEvery" id="specificHour" value="specificHour"
+                           @change="cron">
+                     </td>
+                     <td>
+                        <div class="ui fluid search selection dropdown" :id="hourDropdownId" v-show="hour.cronEvery==='specificHour'">
+                           <input type="hidden" name="hourInput" v-model="hour.specific" value="hour.specific" ref="valueDropdownHour" @change="update('hour')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 24" :data-value="val-1">{{val-1}}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- Days -->
+         <div class="ui bottom attached tab segment cron-tab" data-tab="tab-days">
+            <table class="ui definition table">
+               <tbody>
+                  <!-- Every day (*) -->
+                  <tr>
+                     <td>
+                        <label for="everyDay">{{ $t("message.ui.cron-component.daysEvery") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="days" v-model="day.cronEvery" id="everyDay" value="everyDay"
+                           @change="cron">
+                     </td>
+                     <td></td>
+                  </tr>
+                  <!-- Day of the week (SUN/MON/...) -->
+                  <tr>
+                     <td>
+                        <label for="specificWeekDay">{{ $t("message.ui.cron-component.weeksSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="days" v-model="day.cronEvery" id="specificWeekDay"
+                           value="specificWeekDay" @change="cron">
+                     </td>
+                     <td>
+                        <div class="ui fluid search selection dropdown" :id="dayWeekDropdownId" v-show="day.cronEvery=='specificWeekDay'">
+                           <input type="hidden" name="dayWeekInput" v-model="week.specific" value="week.specific" ref="valueDropdownDayWeek" @change="update('dayWeek')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 7" :data-value="val">{{ $t('message.ui.cron-component.weekDay'+val) }}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+                  <!-- Pick a day in the month (int) -->
+                  <tr>
+                     <td>
+                        <label for="specificMonthDay">{{ $t("message.ui.cron-component.daysSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="days" v-model="day.cronEvery" id="specificMonthDay"
+                           value="specificMonthDay" @change="cron">
+                     </td>
+                     <td>
+                        <div class="ui fluid search selection dropdown" :id="dayMonthDropdownId" v-show="day.cronEvery=='specificMonthDay'">
+                           <input type="hidden" name="dayMonthInput" v-model="day.specific" value="day.specific" ref="valueDropdownDayMonth" @change="update('dayMonth')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 31" :data-value="val">{{ val }}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- Months -->
+         <div class="ui bottom attached tab segment cron-tab" data-tab="tab-months">
+            <table class="ui definition table">
+               <tbody>
+                  <!-- Every Month (*) -->
+                  <tr>
+                     <td>
+                        <label for="everyMonth">{{ $t("message.ui.cron-component.monthsEvery") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="months" v-model="month.cronEvery" id="everyMonth" value="everyMonth"
+                           @change="cron">
+                     </td>
+                     <td></td>
+                  </tr>
+                  <!-- Pick a Month (int) -->
+                  <tr>
+                     <td>
+                        <label for="specificMonth">{{ $t("message.ui.cron-component.monthsSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="months" v-model="month.cronEvery" id="specificMonth"
+                           value="specificMonth" @change="cron">
+                     </td>
+                     <td>
+                        <div class="ui fluid search selection dropdown" :id="monthDropdownId" v-show="month.cronEvery=='specificMonth'">
+                           <input type="hidden" name="monthInput" v-model="month.specific" value="month.specific" ref="valueDropdownMonth" @change="update('month')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 12" :data-value="val">{{ $t('message.ui.cron-component.month'+val) }}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- Year -->
+         <div class="ui bottom attached tab segment cron-tab" data-tab="tab-years">
+            <table class="ui definition table">
+               <tbody>
+                  <!-- Every Year (*) -->
+                  <tr>
+                     <td>
+                        <label for="everyYear">{{ $t("message.ui.cron-component.yearsEvery") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="years" v-model="year.cronEvery" id="everyYear" value="everyYear"
+                           @change="cron">
+                     </td>
+                     <td></td>
+                  </tr>
+                  <!-- Pick a Year (int) -->
+                  <tr>
+                     <td>
+                        <label for="specificYear">{{ $t("message.ui.cron-component.yearsSpecific") }}</label>
+                     </td>
+                     <td>
+                        <input type="radio" name="years" v-model="year.cronEvery" id="specificYear" value="specificYear"
+                           @change="cron">
+                     </td>
+                     <td>
+                        <div class="ui fluid search selection dropdown" :id="yearDropdownId" v-show="year.cronEvery=='specificYear'">
+                           <input type="hidden" name="yearInput" v-model="year.specific" value="year.specific" ref="valueDropdownYear" @change="update('year')">
+                           <div class="default text"></div>
+                           <i class="dropdown icon"></i>
+                           <!-- Dropdown items -->
+                           <div class="menu" >
+                              <div class="item" v-for="val in 5" :data-value="currentYear-1+val">{{ currentYear-1+val }}</div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <br>
+         <div id="recapCron">
+            {{ createCronString() }}
+         </div>
+         <div id="recapText">
+            <!-- Day -->
+            <span v-if="this.day.cronEvery == 'everyDay'">{{ $t("message.ui.cron-component.everyDayOf") }} </span>
+            <span
+               v-if="this.day.cronEvery == 'specificWeekDay'">{{ $t('message.ui.cron-component.weekDay'+week.specific) }}
+            </span>
+            <span v-if="this.day.cronEvery == 'specificMonthDay'">{{ day.specific }}
+               {{ $t("message.ui.cron-component.suffixDay") }}</span>
+            <!-- Month -->
+            <span v-if="this.month.cronEvery == 'everyMonth'">{{ $t("message.ui.cron-component.everyMonthOf") }} </span>
+            <span
+               v-if="this.month.cronEvery == 'specificMonth'">{{ $t('message.ui.cron-component.month'+month.specific) }}</span>
+            <!-- Year -->
+            <span v-if="this.year.cronEvery == 'everyYear'">{{ $t("message.ui.cron-component.everyYearAt") }} : </span>
+            <span v-if="this.year.cronEvery == 'specificYear'">{{ year.specific }} : </span>
+            <!-- Hour -->
+            <span v-if="this.hour.cronEvery == 'everyHour'">{{ $t("message.ui.cron-component.everyHoursAt") }}, </span>
+            <span v-if="this.hour.cronEvery == 'specificHour'">{{ hour.specific }}h</span>
+            <!-- Minute -->
+            <span v-if="this.minute.cronEvery == 'everyMinute'">{{ $t("message.ui.cron-component.everyMinutesAt") }},
+            </span>
+            <span v-if="this.minute.cronEvery == 'specificMinute'">{{ minute.specific }}m</span>
+            <!-- Second -->
+            <span
+               v-if="this.second.cronEvery == 'everySecond'">{{ $t("message.ui.cron-component.everySecondsAt") }}.</span>
+            <span v-if="this.second.cronEvery == 'specificSecond'">{{ second.specific }}s</span>
+            <!-- TimeZone -->
+            <span class="timezone"> UTC </span>
+         </div>
+         <br>
+         <div class="warning-cron" v-if="warning.show">{{ warning.message }}</div>
+      </div>
+      <!--  Save & Exit -->
+      <div slot="footer">
+         <button id="validCron" class="ui button" v-on:click="validCron()">
+            {{ $t("message.ui.cron-component.validCron") }}
+         </button>
+         <button id="cancelCron" class="ui button" v-on:click="setCronModal(false)">
+            {{ $t("message.ui.cron-component.cancelCron") }}
+         </button>
+      </div>
+   </modal-view>
+</div>
